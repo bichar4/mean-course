@@ -3,7 +3,7 @@
 import { Component,EventEmitter,Output,OnInit } from "@angular/core";
 
 import {Post} from '../post.model';
-import { NgForm } from "@angular/forms";
+import { NgForm, FormGroup, FormControl, Validators } from "@angular/forms";
 import { PostsService } from './../post.service';
 import { ActivatedRoute,ParamMap } from "@angular/router";
 @Component({
@@ -19,6 +19,7 @@ export class PostCreateComponent implements OnInit{
     private mode = 'create';  
     private postId:string;
     isLoading = false;
+    form:FormGroup
 
     //this is used for element referencing
     // onAddPost(postInput:HTMLTextAreaElement){
@@ -30,6 +31,12 @@ export class PostCreateComponent implements OnInit{
 
     }
     ngOnInit(){
+        this.form = new FormGroup({
+            'title':new FormControl(null,{
+                validators:[Validators.required,Validators.minLength(3)]
+            }),
+            'content':new FormControl(null,{validators:[Validators.required]})
+        });
         this.route.paramMap.subscribe((paramMap : ParamMap)=>{
             if(paramMap.has('postId')){
                 this.mode = 'edit';
@@ -38,26 +45,32 @@ export class PostCreateComponent implements OnInit{
                 this.postsService.getPost(this.postId).subscribe(postData=>{
                     this.isLoading = false;
                     this.post = {id:postData._id,title:postData.title,content:postData.content}
-                })
+                    this.form.setValue({
+                        title:this.post.title,
+                        content:this.post.content
+                    });
+                });
+             
+               
             }else {
                 this.mode = 'create';
                 this.postId = null;
             }
         });
     }
-    onSavePost(form:NgForm){
-        if(form.invalid){
+    onSavePost(){
+        if(this.form.invalid){
             return;
         }
         this.isLoading = true;
         if(this.mode === "create"){
-            this.postsService.addPost(form.value.title,form.value.content);
+            this.postsService.addPost(this.form.value.title,this.form.value.content);
         }else{
-            this.postsService.updatePost(this.postId,form.value.title,form.value.content);
+            this.postsService.updatePost(this.postId,this.form.value.title,this.form.value.content);
         }
 
        
-          form.resetForm();   
+         this.form.reset();   
     }
 
 }
