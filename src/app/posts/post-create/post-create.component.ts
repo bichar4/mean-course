@@ -20,6 +20,7 @@ export class PostCreateComponent implements OnInit{
     private postId:string;
     isLoading = false;
     form:FormGroup
+    imagePreview : string;
 
     //this is used for element referencing
     // onAddPost(postInput:HTMLTextAreaElement){
@@ -35,7 +36,9 @@ export class PostCreateComponent implements OnInit{
             'title':new FormControl(null,{
                 validators:[Validators.required,Validators.minLength(3)]
             }),
-            'content':new FormControl(null,{validators:[Validators.required]})
+            'content':new FormControl(null,{validators:[Validators.required]}),
+            'image':new FormControl(null,{validators:[Validators.required]})
+            
         });
         this.route.paramMap.subscribe((paramMap : ParamMap)=>{
             if(paramMap.has('postId')){
@@ -57,6 +60,16 @@ export class PostCreateComponent implements OnInit{
                 this.postId = null;
             }
         });
+    }
+    onImagePicked(event:Event){
+        const file = (event.target as HTMLInputElement).files[0]; // typeconversion ofthe value  
+        this.form.patchValue({image:file});
+        this.form.get('image').updateValueAndValidity();
+        const reader = new FileReader();
+        reader.onload = () =>{
+            this.imagePreview = reader.result;
+        };
+        reader.readAsDataURL(file);
     }
     onSavePost(){
         if(this.form.invalid){
