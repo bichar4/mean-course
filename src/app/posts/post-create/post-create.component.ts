@@ -3,9 +3,10 @@
 import { Component,EventEmitter,Output,OnInit } from "@angular/core";
 
 import {Post} from '../post.model';
-import { NgForm, FormGroup, FormControl, Validators } from "@angular/forms";
+import { NgForm, FormGroup, FormControl, Validators} from "@angular/forms";
 import { PostsService } from './../post.service';
 import { ActivatedRoute,ParamMap } from "@angular/router";
+import { mimeType} from "./mime-type.validator";
 @Component({
     selector:'app-post-create',
     templateUrl:'./post-create.component.html',
@@ -37,7 +38,10 @@ export class PostCreateComponent implements OnInit{
                 validators:[Validators.required,Validators.minLength(3)]
             }),
             'content':new FormControl(null,{validators:[Validators.required]}),
-            'image':new FormControl(null,{validators:[Validators.required]})
+            'image':new FormControl(null,{
+                validators:[Validators.required],
+                asyncValidators:[mimeType]
+            })
             
         });
         this.route.paramMap.subscribe((paramMap : ParamMap)=>{

@@ -29,9 +29,10 @@
                         <!-- by default, the button has type submit-->
                         <input type="file" #filePicker (change)="onImagePicked($event)">
                 </div>
-                <div class="image-preview">
-                        <img [src]="imagePreview" *ngIf="imagePreview !== '' && imagePreview" [alt]="form.value.title">
+                <div class="image-preview" *ngIf="imagePreview !== '' && imagePreview && form.get('image').valid" >
+                        <img [src]="imagePreview" [alt]="form.value.title">
                 </div>
+                <mat-error *ngIf = "!form.get('image').valid && imagePreview">Please insert a valid image</mat-error>
                 <mat-form-field>
                         <textarea matInput row="6" formControlName="content" placeholder="post content"></textarea>
                         <mat-error *ngIf="form.get('content').invalid">Please enter a title</mat-error>
